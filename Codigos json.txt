@@ -1,0 +1,52 @@
+{
+  "Comment": "Assistente de Delivery com AWS Step Functions e Bedrock",
+  "StartAt": "ReceberPedido",
+  "States": {
+    "ReceberPedido": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:REGION:ACCOUNT_ID:function:ReceberPedido",
+      "Next": "CalcularRota"
+    },
+    "CalcularRota": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:REGION:ACCOUNT_ID:function:CalcularRota",
+      "Next": "AtualizarStatus"
+    },
+    "AtualizarStatus": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:REGION:ACCOUNT_ID:function:AtualizarStatus",
+      "Next": "ConfirmarEntrega"
+    },
+    "ConfirmarEntrega": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:REGION:ACCOUNT_ID:function:ConfirmarEntrega",
+      "End": true
+    }
+  }
+}
+
+{
+  "TableName": "Pedidos",
+  "KeySchema": [
+    { "AttributeName": "PedidoID", "KeyType": "HASH" }
+  ],
+  "AttributeDefinitions": [
+    { "AttributeName": "PedidoID", "AttributeType": "S" }
+  ],
+  "ProvisionedThroughput": {
+    "ReadCapacityUnits": 5,
+    "WriteCapacityUnits": 5
+  }
+}
+
+{
+  "ModelId": "bedrock-model-id",
+  "Input": {
+    "RouteParameters": {
+      "StartLocation": "start_location",
+      "EndLocation": "end_location"
+    }
+  }
+}
+
+
